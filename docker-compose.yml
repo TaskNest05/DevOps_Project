@@ -1,0 +1,29 @@
+version: '3.8'  # Usando a versão 3.8 do Docker Compose (não é obsoleto)
+services:
+  mongo:
+    image: mongo:latest
+    container_name: mongo
+    ports:
+      - "27017:27017"   # Mapeando a porta do MongoDB para o host
+    volumes:
+      - mongo-data:/data/db  # Volumes para persistir dados do MongoDB
+
+  backend:
+    build: .  # Construir a imagem a partir do Dockerfile no diretório atual
+    container_name: tasknest-backend
+    ports:
+      - "5000:5000"  # Mapeando a porta do backend para o host
+    depends_on:
+      - mongo  # Garante que o mongo inicie antes do backend
+    environment:
+      - MONGO_URI=mongodb://mongo:27017  # Variável de ambiente para conexão com o MongoDB
+    networks:
+      - tasknest-network  # Rede para conectar os contêineres entre si
+
+volumes:
+  mongo-data:  # Definindo um volume para persistir os dados do MongoDB
+
+networks:
+  tasknest-network:  # Definindo uma rede personalizada para os contêineres se comunicarem
+    driver: bridge  # Usando o driver bridge, que é o padrão
+
